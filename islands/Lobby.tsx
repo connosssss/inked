@@ -9,6 +9,7 @@ export default function Lobby() {
 
     const [players, setPlayers] = useState([]);
     const[isHost, setIsHost] = useState(false);
+    const [socket, setSocket] = useState<WebSocket | null>(null);
 
 
 
@@ -19,9 +20,25 @@ export default function Lobby() {
         try {
             
 
-
-
             //get players and set
+            // Note: This assumes ws.ts is located at routes/api/ws.ts
+            const ws = new WebSocket(window.location.origin.replace("http", "ws") + "/api/ws");
+            
+            ws.onopen = () => {
+                ws.send(JSON.stringify({ type: "join", code, username: userName }));
+            };
+
+            ws.onerror = (e) => console.log("WebSocket error:", e);
+
+            ws.onmessage = (e) => {
+                const message = JSON.parse(e.data);
+
+                if (message.type === "joined") {
+                    setPlayers(message.players);
+                }
+
+            };
+            setSocket(ws);
             
             setScreen("Lobby");
         }
@@ -32,6 +49,8 @@ export default function Lobby() {
 
         
     }
+
+    
     const handleCreate = () =>{
         
 
@@ -41,6 +60,29 @@ export default function Lobby() {
 
 
             //get players and set
+
+            const ws = new WebSocket(window.location.origin.replace("http", "ws") + "/api/ws");
+
+            ws.onopen = () => {
+                ws.send(JSON.stringify({ type: "create", username: userName }));
+            };
+            
+            ws.onerror = (e) => console.log("WebSocket Error:", e);
+
+            ws.onmessage = (e) => {
+                const message = JSON.parse(e.data);
+                
+                if (message.type === "created") {
+                    setCode(message.code);
+                    setPlayers(message.players);
+                }
+                
+                if (message.type === "joined") {
+                    setPlayers(message.players);
+                }
+            };
+            setSocket(ws);
+
             setIsHost(true);
             setScreen("Lobby");
         }
@@ -51,6 +93,21 @@ export default function Lobby() {
 
         
     }
+
+    const handleLeave = () => {
+        if (socket) {
+            socket.close();
+        }
+        
+        setSocket(null);
+        setPlayers([]);
+        setIsHost(false);
+        setScreen("joinLobby");
+    };
+
+    const handleStart = () => {
+        console.log("start game");
+    };
 
 
 
@@ -117,14 +174,14 @@ export default function Lobby() {
             <div class="w-10/12 bg-slate-200 flex flex-col gap-6 text-center">
 
 
-                {players.map((player) => {
+                {players.map((player) => (
                     <div> {player}</div>
-                })}
+                ))}
             </div>
         
             <button
                 class="w-full h-[3rem] bg-emerald-300 rounded-2xl font-semibold"
-                onClick={handleJoin}> {isHost ? "Start" : "Leave" }</button>
+                onClick={isHost ? handleStart : handleLeave}> {isHost ? "Start" : "Leave" }</button>
 
 
             </div>
