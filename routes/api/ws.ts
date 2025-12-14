@@ -25,13 +25,13 @@ export const handler: Handlers = {
             const message = JSON.parse(e.data)
 
 
-
+            // LOBBY MANAGEMENT
             if (message.type == "create"){
                 const newCode = Math.random().toString(32).substring(0,8)
                 const hostId = crypto.randomUUID();
                 
 
-
+                
                 await kv.set(["lobbies", newCode], {
                     players: [
                         { id: hostId, name: message.username }
@@ -40,7 +40,7 @@ export const handler: Handlers = {
                     host: hostId
                 })
                 
-
+                
                 connections.set(hostId, socket);
                 userId = hostId
 
@@ -132,9 +132,65 @@ export const handler: Handlers = {
                     }
                 }
             }
-
-             
             
+            if (message.type == "start") {
+                const entry = await kv.get(["lobbies", message.code]);
+                const lobby = entry.value;
+
+                if (lobby) {
+                    for (const player of lobby.players) {
+                        const userSocket = connections.get(player.id);
+                        if (userSocket && userSocket.readyState === WebSocket.OPEN) {
+                            userSocket.send(JSON.stringify({ type: "start" }));
+                        }
+                    }
+                }
+            }
+
+
+
+
+
+
+
+            //DRAWING PART 
+            if (message.type == "draw") {
+                const entry = await kv.get(["lobbies", message.code]);
+                const lobby = entry.value;
+
+                if (lobby) {
+                    for (const player of lobby.players) {
+                        if (player.id !== userId) {
+                            const userSocket = connections.get(player.id);
+                            if (userSocket && userSocket.readyState === WebSocket.OPEN) {
+                                userSocket.send(JSON.stringify(message));
+                            }
+                        }
+                    }
+                }
+            }
+
+            
+
+            if (message.type == "clear") {
+                const entry = await kv.get(["lobbies", message.code]);
+                const lobby = entry.value;
+
+                if (lobby) {
+                    for (const player of lobby.players) {
+                        
+                        if (player.id !== userId) {
+                            const userSocket = connections.get(player.id);
+
+                            if (userSocket && userSocket.readyState === WebSocket.OPEN) {
+
+                                userSocket.send(JSON.stringify({ type: "clear" }));
+                                
+                            }
+                        }
+                    }
+                }
+            }
         }
 
 

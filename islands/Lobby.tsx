@@ -1,4 +1,5 @@
 import { useState } from "preact/hooks";
+import Canvas from "./Canvas.tsx";
 
 
 export default function Lobby() {
@@ -10,6 +11,7 @@ export default function Lobby() {
     const [players, setPlayers] = useState([]);
     const[isHost, setIsHost] = useState(false);
     const [socket, setSocket] = useState<WebSocket | null>(null);
+    const [gameStarted, setGameStarted] = useState(false);
 
 
 
@@ -35,6 +37,9 @@ export default function Lobby() {
 
                 if (message.type === "joined") {
                     setPlayers(message.players);
+                }
+                if (message.type === "start") {
+                    setGameStarted(true);
                 }
 
             };
@@ -80,6 +85,9 @@ export default function Lobby() {
                 if (message.type === "joined") {
                     setPlayers(message.players);
                 }
+                if (message.type === "start") {
+                    setGameStarted(true);
+                }
             };
             setSocket(ws);
 
@@ -117,6 +125,9 @@ export default function Lobby() {
 
     const handleStart = () => {
         console.log("start game");
+        if (socket && isHost) {
+            socket.send(JSON.stringify({ type: "start", code }));
+        }
     };
 
 
@@ -204,6 +215,18 @@ export default function Lobby() {
                 onClick={isHost ? handleStart : handleLeave}> {isHost ? "Start" : "Leave" }</button>
 
 
+            </div>
+        )}
+
+        {gameStarted && (
+            <div class="h-full w-full flex flex-col items-center gap-4 mt-14">
+                <Canvas socket={socket} code={code} />
+                <button
+                    class="px-4 py-2 bg-gray-400 rounded hover:bg-gray-500 text-white"
+                    onClick={handleLeave}
+                >
+                    Leave Game
+                </button>
             </div>
         )}
         </div>
