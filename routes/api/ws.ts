@@ -106,10 +106,11 @@ export const handler: Handlers = {
 
                 if(playerToRemove){
 
-                    connections.delete(playerToRemove.id);
                     const playerSocket = connections.get(playerToRemove.id);
+                    connections.delete(playerToRemove.id);
 
                     if (playerSocket && playerSocket.readyState === WebSocket.OPEN) {
+                        playerSocket.send(JSON.stringify({ type: "kicked" }));
                         playerSocket.close();
                     }
 

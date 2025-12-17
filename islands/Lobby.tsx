@@ -1,5 +1,6 @@
 import { useState } from "preact/hooks";
 import Canvas from "./Canvas.tsx";
+import PlayerList from "./PlayerList.tsx";
 
 
 export default function Lobby() {
@@ -87,6 +88,13 @@ export default function Lobby() {
                 }
                 if (message.type === "start") {
                     setGameStarted(true);
+                }
+
+                if (message.type === "kicked") {
+                    setSocket(null);
+                    setPlayers([]);
+                    setIsHost(false);
+                    setScreen("joinLobby");
                 }
             };
             setSocket(ws);
@@ -227,6 +235,12 @@ export default function Lobby() {
                 >
                     Leave Game
                 </button>
+                <PlayerList
+                    players={players}
+                    isHost={isHost}
+                    currentUserName={userName}
+                    onKick={handleRemovePlayer}
+                />
             </div>
         )}
         </div>
