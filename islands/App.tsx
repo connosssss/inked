@@ -150,7 +150,7 @@ export default function App() {
                 )}
 
                 {screen === "lobby" && (
-                    <div class="h-full w-full flex flex-col items-center gap-12 mt-14">
+                    <div class="h-full w-full flex flex-col items-center gap-12 ">
                         <h1 class="text-4xl mt-8 font-semibold">{code}</h1>
 
                         <div class="w-10/12 bg-slate-200 flex flex-col gap-6 text-center">
@@ -179,7 +179,7 @@ export default function App() {
                 )}
 
                 {screen === "game" && (
-                    <div class="h-full w-full flex flex-col items-center gap-4 mt-14">
+                    <div class="h-full w-full flex flex-col items-center gap-4">
                         <Canvas socket={socket} code={code} />
                         <button
                             class="px-4 py-2 bg-gray-400 rounded hover:bg-gray-500 text-white"

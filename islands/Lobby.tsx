@@ -11,7 +11,7 @@ interface LobbyProps {
 
 export default function Lobby({ userName, setUserName, code, setCode, onJoin, onCreate }: LobbyProps) {
     return (
-        <div class="h-full w-full flex flex-col items-center gap-12 mt-14">
+        <div class="h-full w-full flex flex-col items-center gap-12">
             <h1 class="text-4xl mt-8 font-semibold">___</h1>
 
             <div class="w-10/12 bg-slate-200 flex flex-col gap-6 text-center">
