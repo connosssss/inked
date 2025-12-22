@@ -1,4 +1,8 @@
 import { useEffect, useRef, useState } from "preact/hooks";
+import PlayerList from "./PlayerList.tsx";
+
+
+
 
 interface CanvasProps {
     socket: WebSocket | null;
@@ -17,8 +21,13 @@ export default function Canvas({ socket, code }: CanvasProps) {
 
 
     const [color, setColor] = useState("#000000");
-    const [size, setSize] = useState(2);
+    const [size, setSize] = useState(5);
     const [erase, setErase] = useState(false);
+
+
+
+
+    const [showPlayerList, setShowPlayerList] = useState(false);
 
 
     useEffect(() => {
@@ -126,15 +135,15 @@ export default function Canvas({ socket, code }: CanvasProps) {
 
 
     return (
-        <div class="flex flex-col items-center gap-4 w-full h-screen bg-gray-100 p-4">
+        <div class="flex flex-col items-center gap-4 w-full h-screen p-4 font-mono text-white">
             
     
-            <div class="flex flex-wrap gap-2 bg-red-200 p-2 rounded shadow">
+            <div class="flex flex-wrap gap-2 bg-slate-500 p-2 rounded shadow items-center">
                 <input 
                     type="color" 
                     value={color} 
                     onInput={(e) => setColor(e.currentTarget.value)} 
-                    class="h-10 w-10 cursor-pointer border-none"
+                    class="h-12 w-12 cursor-pointer border-none rounded bg-slate-500"
                 />
 
                 <button 
@@ -152,7 +161,7 @@ export default function Canvas({ socket, code }: CanvasProps) {
                             socket.send(JSON.stringify({ type: "clear", code }));
                         }
                     }}
-                    class="px-4 py-2"
+                    class="px-4 h-5/6 bg-rose-600/50 hover:bg-rose-800/50 text-white rounded transition-colors duration-200"
                 >
                     Clear
                 </button>
@@ -165,8 +174,10 @@ export default function Canvas({ socket, code }: CanvasProps) {
                     {erase ? "Drawing Mode" : "Erasing Mode"}
                 </button>
 
-                <input type="range" id="size" min="1" max="50" value={size} onInput={(e) => setSize(Number(e.currentTarget.value))} />
-                <input type="text" id="size" value={size} onInput={(e) => setSize(Number(e.currentTarget.value))} />
+                <input type="range" id="size" min="1" max="200" value={size} onInput={(e) => setSize(Number(e.currentTarget.value))} 
+                class="accent-[#273346]"/>
+                <input type="text" id="size" value={size} onInput={(e) => setSize(Number(e.currentTarget.value))}
+                class="bg-slate-500 text-center w-[4rem] text-xl"  />
             </div>
             
             <div 
