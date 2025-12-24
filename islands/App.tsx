@@ -223,6 +223,7 @@ export default function App() {
                             isHost={isHost}
                             currentUserName={userName}
                             onKick={handleRemovePlayer}
+                            lobbyCode={code}
                         />)}
                     </div>
                 )}
