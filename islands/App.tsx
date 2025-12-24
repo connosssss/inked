@@ -193,7 +193,7 @@ export default function App() {
                     </div>
                 )}
 
-                {(screen === "game" || screen == "joinLobby" ) && (<div
+                {(screen === "game"  ) && (<div
                 class="flex flex-col gap-10 w-full justify-center items-center mb-20">
                     <Canvas socket={socket} code={code} />
                     <div class="h-full w-full flex flex-row items-center justify-center gap-4">

@@ -16,6 +16,8 @@ export const handler: Handlers = {
         const {socket, response } = Deno.upgradeWebSocket(request);
         let userId: string | null = null;
 
+        let hasStarted = false;
+
         socket.onopen = () => {
             console.log("connected to socket")
         }
@@ -27,7 +29,7 @@ export const handler: Handlers = {
 
             // LOBBY MANAGEMENT
             if (message.type == "create"){
-                const newCode = Math.random().toString(32).substring(0,8)
+                const newCode = Math.random().toString(32).substring(2,10)
                 const hostId = crypto.randomUUID();
                 
 
@@ -37,7 +39,8 @@ export const handler: Handlers = {
                         { id: hostId, name: message.username }
                     ],
 
-                    host: hostId
+                    host: hostId,
+                    hasStarted: false
                 })
                 
                 
@@ -85,7 +88,13 @@ export const handler: Handlers = {
                             code: message.code,
                             players: players
                             }
+                            
                         ));
+
+                        if (lobby.hasStarted){
+                                userSocket.send(JSON.stringify({ type: "start" }));
+                        }
+
                      }
                     }
         
@@ -137,6 +146,8 @@ export const handler: Handlers = {
             if (message.type == "start") {
                 const entry = await kv.get(["lobbies", message.code]);
                 const lobby = entry.value;
+                lobby.hasStarted = true;
+                await kv.set(["lobbies", message.code], lobby);
 
                 if (lobby) {
                     for (const player of lobby.players) {
