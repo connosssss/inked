@@ -131,6 +131,27 @@ export default function Canvas({ socket, code }: CanvasProps) {
         setLastY(e.offsetY);
     };
 
+    const downloadCanvas = () => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const tempCanvas = document.createElement("canvas");
+        const tempCtx = tempCanvas.getContext("2d");
+        
+        if (!tempCtx) return;
+
+        tempCanvas.width = canvas.width;
+        tempCanvas.height = canvas.height;
+
+        tempCtx.fillStyle = "#FFFFFF";
+        tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+        tempCtx.drawImage(canvas, 0, 0);
+
+        const link = document.createElement("a");
+        link.download = `canvas-${Date.now()}.png`;
+        link.href = tempCanvas.toDataURL("image/png");
+        link.click();
+    };
 
 
     return (
@@ -163,6 +184,13 @@ export default function Canvas({ socket, code }: CanvasProps) {
                     class="px-4 h-5/6 bg-rose-600/50 hover:bg-rose-800/50 text-white rounded transition-colors duration-200"
                 >
                     Clear
+                </button>
+
+                <button 
+                    onClick={downloadCanvas}
+                    class="px-4 h-5/6 bg-emerald-600/50 hover:bg-emerald-800/50 text-white rounded transition-colors duration-200"
+                >
+                    Save
                 </button>
                 
 
